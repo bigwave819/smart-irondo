@@ -2,6 +2,7 @@ import express from 'express'
 import { ENV } from './config/env.js'
 import { db } from './db/conn.js' // Import db
 import userRoutes from './routes/user.routes.js'
+import adminRoutes from './routes/admin.routes.js'
 
 const app = express()
 
@@ -23,6 +24,7 @@ app.get('/health', async (req, res) => {
 
 
 app.use('/api/user', userRoutes)
+app.use('api/admin', adminRoutes)
 
 const PORT = ENV.PORT
 app.listen(PORT, () => {

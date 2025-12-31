@@ -1,47 +1,8 @@
 import { eq } from 'drizzle-orm'
 import { db } from '../db/conn.js'
-import crypto from 'crypto'
 import bcryptjs from 'bcryptjs'
 import { user } from '../db/schema.js'
 import jwtToken from '../utils/jwtToken.js'
-import { use } from 'react'
-
-export const createdByAdmin = async (req, res) => {
-    try {
-        const { fullName, phone, location } = req.body
-
-        if (!fullName || !phone || !location) {
-            return res.status(400).json({ message: 'all fields are requires' })
-        }
-
-        const existingUser = await db.query.user.findFirst({
-            where: eq(phone)
-        })
-
-        if (existingUser) {
-            return res.status(400).json({ message: 'User exists' })
-        }
-
-        const activationCode = crypto.randomInt(100000, 999999)
-
-        await db.insert(user).values({
-            fullName,
-            phone,
-            role: "user",
-            isActive: false,
-            activationCode,
-            location
-        })
-
-        //  TODO:SEND VIA SMS
-
-        res.status(201).json({
-            message: "User created and Active code sent successfully"
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' })
-    }
-}
 
 export const VerifyActivationCode = async (req, res) => {
     try {
