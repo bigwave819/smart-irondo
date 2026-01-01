@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
-import { evidence } from "../db/schema";
-import { user } from "../db/schema";
+import { evidence } from "../db/schema.js";
+import { user } from "../db/schema.js";
 import crypto from 'crypto'
 
 export const createdByAdmin = async (req, res) => {
@@ -65,7 +65,7 @@ export const updateTheEvidenceStatus = async (req, res) => {
 
 
     } catch (error) {
-        return res.status(500).json({ message: `the server error due ${error}` })
+        res.status(500).json({ message: `the server error due ${error}` })
     }
 }
 
@@ -92,6 +92,6 @@ export const deactivateTheUser = async (req, res) => {
     });
 
     } catch (error) {
-        
+        res.status(500).json({ message: `the server error due ${error}` })
     }
 }
