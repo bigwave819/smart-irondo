@@ -14,7 +14,7 @@ export const ProtectedRoute = async (req, res, next) => {
         const decoded = jwt.verify(token, ENV.JWT_SECRET)
 
         const user = await db.query.user.findFirst({
-            where: eq(decoded.id),
+            where: eq(user.id, decoded.id),
             columns: {
                 password: false
             }

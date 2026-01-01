@@ -6,10 +6,9 @@ import {
   text,
   jsonb,
   timestamp,
-  integer
+  integer,
 } from "drizzle-orm/pg-core";
-
-
+import { relations } from "drizzle-orm";
 
 export const user = pgTable("user", {
   id: serial("id").primaryKey(),
@@ -50,3 +49,27 @@ export const evidence = pgTable("evidence", {
   type: varchar("type", { length: 10 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const usersRelations = relations(user, ({ many }) => ({
+  reports: many(reports),
+  evidence: many(evidence),
+}));
+
+export const reportsRelations = relations(reports, ({ one, many }) => ({
+  reportedBy: one(user, {
+    fields: [reports.reportedBy],
+    references: [user.id],
+  }),
+  evidence: many(evidence),
+}));
+
+export const evidenceRelations = relations(evidence, ({ one }) => ({
+  report: one(reports, {
+    fields: [evidence.reportId],
+    references: [reports.id],
+  }),
+  uploadedBy: one(user, {
+    fields: [evidence.uploadedBy],
+    references: [user.id],
+  }),
+}));
