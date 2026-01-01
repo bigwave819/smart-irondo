@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm"
 import { evidence } from "../db/schema.js";
 import { user } from "../db/schema.js";
+import { db } from '../db/conn.js'
 import crypto from 'crypto'
 
 export const createdByAdmin = async (req, res) => {
@@ -91,6 +92,20 @@ export const deactivateTheUser = async (req, res) => {
       message: "User deactivated successfully",
     });
 
+    } catch (error) {
+        res.status(500).json({ message: `the server error due ${error}` })
+    }
+}
+
+export const getAllAbanyerondo = async (_, res) => {
+    try {
+        const users = await db.select().from(user)
+
+        if (users.length === 0 ) {
+            return res.status(404).json({ message: "0 users found" })
+        }
+
+        res.status(200).json(users)
     } catch (error) {
         res.status(500).json({ message: `the server error due ${error}` })
     }

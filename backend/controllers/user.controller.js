@@ -5,6 +5,31 @@ import cloudinary from "../config/cloudinary.js";
 import PDFDocument from "pdfkit"
 import axios from 'axios'
 
+/* ===========================
+   CLOUDINARY BUFFER UPLOAD
+=========================== */
+
+const uploadToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    const resourceType = file.mimetype.startsWith("video")
+      ? "video"
+      : "image";
+
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: "evidences",
+          resource_type: resourceType,
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      )
+      .end(file.buffer);
+  });
+};
+
 export const uploadEvidence = async (req, res) => {
   try {
     const { reportId } = req.params;
@@ -18,36 +43,35 @@ export const uploadEvidence = async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
+    if (report.status === "Resolved") {
+      return res.status(400).json({
+        message: "Cannot add evidence to a resolved report",
+      });
+    }
+
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "Evidence files are required" });
     }
+
+
     const uploadResults = await Promise.all(
-      req.files.map((file) =>
-        cloudinary.uploader.upload(file.path, {
-          folder: "evidences",
-          resource_type: "auto",
-        })
-      )
+      req.files.map((file) => uploadToCloudinary(file))
     );
 
-    const savedEvidence = [];
+    /* ===== Prepare DB insert ===== */
+    const evidenceData = uploadResults.map((result) => ({
+      reportId: report.id,
+      uploadedBy,
+      url: result.secure_url,
+      type: result.resource_type, // image | video
+      publicId: result.public_id,
+      status: "pending",
+    }));
 
-    for (const result of uploadResults) {
-      const type = result.resource_type;
-
-      const [saved] = await db
-        .insert(evidence)
-        .values({
-          reportId: report.id,
-          uploadedBy,
-          url: result.secure_url,
-          type,
-          status: "pending",
-        })
-        .returning();
-
-      savedEvidence.push(saved);
-    }
+    const savedEvidence = await db
+      .insert(evidence)
+      .values(evidenceData)
+      .returning();
 
     return res.status(201).json({
       message: "Evidence uploaded successfully",
@@ -76,7 +100,7 @@ export const generateReport = async (req, res) => {
       patrolEndTime,
     } = req.body;
 
-    if (!reportType || !description || !location || !title ) {
+    if (!reportType || !description || !location || !title) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
