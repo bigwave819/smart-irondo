@@ -6,25 +6,29 @@ import jwtToken from '../utils/jwtToken.js'
 
 export const VerifyActivationCode = async (req, res) => {
     try {
-        const { phone, code } = req.body
+        const { phone, code } = req.body || {}
+        if (!phone || !code)
+            return res.status(400).json({ message: 'Phone and code required' })
 
-        const user = await db.query.user.findFirst({
+        const existingUser = await db.query.user.findFirst({
             where: eq(user.phone, phone)
         })
 
-        if (!user || user.activationCode !== code) {
+        if (!existingUser || existingUser.activationCode !== code) {
             return res.status(400).json({ message: 'Invalid code' })
         }
 
         res.status(200).json({ message: 'Code verified. proceed to password' })
     } catch (error) {
-        return res.status(500).json({ message: `the server error due ${error}` })
+        return res.status(500).json({ message: `Server error: ${error}` })
     }
 }
 
 export const ActivateAccount = async (req, res) => {
     try {
-        const { phone, password } = req.body
+        const { phone, password } = req.body || {}
+        if (!phone || !password)
+            return res.status(400).json({ message: 'Phone and password required' })
 
         const hashedPassword = await bcryptjs.hash(password, 10)
 
@@ -36,42 +40,45 @@ export const ActivateAccount = async (req, res) => {
                 activationCode: null
             })
             .where(eq(user.phone, phone))
+
+        res.status(200).json({ message: 'Account activated successfully' })
     } catch (error) {
-        return res.status(500).json({ message: `the server error due ${error}` })
+        return res.status(500).json({ message: `Server error: ${error}` })
     }
 }
 
 export const login = async (req, res) => {
     try {
-        const { phone, password } = req.body
+        const { phone, password } = req.body || {}
+        if (!phone || !password)
+            return res.status(400).json({ message: 'Phone and password required' })
 
-        const user = await db.query.user.findFirst({
-            where: eq(user.phone, phone)
-        })
+        const existingUser = await db.select().from(user).where(eq(user.phone, phone));
 
-        if (!user || !user.isActive) {
+        const existingUsers = existingUser[0];
+
+        if (!existingUsers || existingUsers.isActive !== true ) {
             return res.status(401).json({ message: "Account not active" });
         }
 
-        isMatch = await bcryptjs.compare(password, user.password)
-
+        const isMatch = await bcryptjs.compare(password, existingUsers.password)
         if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid Credetials' })
+            return res.status(401).json({ message: 'Invalid Credentials' })
         }
 
-        const token = jwtToken({ payload: user.id, payload: user.role })
+        const token = jwtToken({ id: existingUser.id, role: existingUser.role })
 
         res.status(200).json({
             token,
             user: {
-                id: user.id,
-                fullName: user.fullName,
-                phone: user.phone,
-                role: user.role,
-                location: user.location,
+                id: existingUsers.id,
+                fullName: existingUsers.fullName,
+                phone: existingUsers.phone,
+                role: existingUsers.role,
+                location: existingUsers.location,
             },
         })
     } catch (error) {
-        return res.status(500).json({ message: `the server error due ${error}` })
+        return res.status(500).json({ message: `Server error: ${error}` })
     }
 }

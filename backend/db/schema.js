@@ -18,7 +18,7 @@ export const user = pgTable("user", {
   role: varchar("role").notNull().default("user"),
   isActive: boolean("is_Active").default(false),
   activationCode: varchar("activation_code"),
-  location: jsonb("location").notNull(),
+  location: jsonb("location"),
   createdAt: timestamp("created_at").defaultNow(),
 })
 

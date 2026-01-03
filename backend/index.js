@@ -3,9 +3,23 @@ import { ENV } from './config/env.js'
 import { db } from './db/conn.js' // Import db
 import userRoutes from './routes/user.routes.js'
 import adminRoutes from './routes/admin.routes.js'
+import { seedAdmin } from './utils/seed.js'
+import cors from 'cors'
 
 const app = express()
 
+// seedAdmin()
+//   .then(() => process.exit(0))
+//   .catch(console.error);
+
+app.use(express.json());
+app.use(cors({
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST", "DELETE", "PATCH", "UPDATE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+}))
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/health', async (req, res) => {
     try {

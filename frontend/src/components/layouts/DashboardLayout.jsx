@@ -1,5 +1,5 @@
 import Navbar from './Navbar';
-import SlideMenu from './sliderMenu';
+import SidebarMenu from './sliderMenu';
 
 const DashboardLayout = ({ children, activeMenu }) => {
 
@@ -8,7 +8,7 @@ const DashboardLayout = ({ children, activeMenu }) => {
       <Navbar activeMenu={activeMenu} />
         <div className='flex'>
           <div className='max-[1080px]:hidden'>
-            <SlideMenu activeMenu={activeMenu} />
+            <SidebarMenu activeMenu={activeMenu} />
           </div>
           <div className='grow mx-5'>{children}</div>
         </div>

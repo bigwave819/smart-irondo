@@ -12,4 +12,4 @@ pool.on("error", (err) => {
     console.log(`error due to ${err}`);
 })
 
-export const db = drizzle({ client: pool })
+export const db = drizzle(pool)
