@@ -13,7 +13,7 @@ export const createdByAdmin = async (req, res) => {
         }
 
         const existingUser = await db.query.user.findFirst({
-            where: eq(phone)
+            where: eq( user.phone ,phone)
         })
 
         if (existingUser) {

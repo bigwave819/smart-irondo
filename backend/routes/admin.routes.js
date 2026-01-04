@@ -14,7 +14,7 @@ import {
 
 const router = express.Router()
 
-router.use(ProtectedRoute, adminOnly)
+// router.use(ProtectedRoute, adminOnly)
 
 router.post('/create', createdByAdmin);
 router.get('/users', getAllAbanyerondo);

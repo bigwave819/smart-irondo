@@ -7,8 +7,9 @@ const SidebarMenu = ({ activeMenu }) => {
 
   const navigations = [
     { id: 1, label: "Dashboard", path: "/dashboard" },
-    { id: 2, label: "Reports", path: "/reports" },
-    { id: 3, label: "Evidence", path: "/evidences" },
+    { id: 2, label: "Users", path: "/users" },
+    { id: 3, label: "Reports", path: "/reports" },
+    { id: 4, label: "Evidence", path: "/evidences" },
   ];
 
   const handleLogout = () => {
@@ -18,7 +19,7 @@ const SidebarMenu = ({ activeMenu }) => {
   };
 
   return (
-    <aside className="w-72 sticky top-0 border-r border-gray-200 bg-white px-6 py-8 flex flex-col">
+    <aside className="w-72 sticky h-screen top-0 border-r border-gray-200 bg-white px-6 py-8 flex flex-col">
       
       {/* NAVIGATION + LOGOUT TOGETHER */}
       <nav className="space-y-2">

@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import Evidence from './pages/Evidence';
 import PrivateRoute from './components/Protected';
+import Users from './pages/Users';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route element={<PrivateRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/users" element={<Users />} />
         <Route path="/evidences" element={<Evidence />} />
       </Route>
     </Routes>

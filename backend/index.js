@@ -38,7 +38,7 @@ app.get('/health', async (req, res) => {
 
 
 app.use('/api/user', userRoutes)
-app.use('api/admin', adminRoutes)
+app.use('/api/admin', adminRoutes)
 
 const PORT = ENV.PORT
 app.listen(PORT, () => {
