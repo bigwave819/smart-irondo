@@ -5,41 +5,53 @@ import { db } from '../db/conn.js'
 import crypto from 'crypto'
 
 export const createdByAdmin = async (req, res) => {
-    try {
-        const { fullName, phone, location } = req.body
+  try {
+    const { fullName, phone, location } = req.body;
 
-        if (!fullName || !phone || !location) {
-            return res.status(400).json({ message: 'all fields are requires' })
-        }
-
-        const existingUser = await db.query.user.findFirst({
-            where: eq( user.phone ,phone)
-        })
-
-        if (existingUser) {
-            return res.status(400).json({ message: 'User exists' })
-        }
-
-        const activationCode = crypto.randomInt(100000, 999999)
-
-        await db.insert(user).values({
-            fullName,
-            phone,
-            role: "user",
-            isActive: false,
-            activationCode,
-            location
-        })
-
-        //  TODO:SEND VIA SMS
-
-        res.status(201).json({
-            message: "User created and Active code sent successfully"
-        });
-    } catch (error) {
-        res.status(500).json({ message: 'internal server error' })
+    if (
+      !fullName ||
+      !phone ||
+      !location?.district ||
+      !location?.sector ||
+      !location?.cell ||
+      !location?.village
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-}
+
+    const existingUser = await db
+      .select()
+      .from(user)
+      .where(eq(user.phone, phone))
+      .limit(1);
+
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    const activationCode = crypto.randomInt(100000, 999999).toString();
+
+    await db.insert(user).values({
+      fullName,
+      phone,
+      role: "user",
+      isActive: false,
+      activationCode,
+      location,
+    });
+
+    // TODO: send activationCode via SMS
+
+    res.status(201).json({
+      message: "User created. Activation code sent.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 export const updateTheEvidenceStatus = async (req, res) => {
     try {

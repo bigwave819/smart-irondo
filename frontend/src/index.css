@@ -62,3 +62,7 @@
 .animate-scaleIn {
   animation: scaleIn 0.15s ease-out;
 }
+
+.input-modal {
+  @apply w-full ring-2 ring-gray-200 outline-none rounded-lg px-4 py-2;
+}

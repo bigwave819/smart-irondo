@@ -14,7 +14,7 @@ export const user = pgTable("user", {
   id: serial("id").primaryKey(),
   fullName: varchar("full_name", { length: 100 }).notNull(),
   phone: varchar("phone").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"),
   role: varchar("role").notNull().default("user"),
   isActive: boolean("is_Active").default(false),
   activationCode: varchar("activation_code"),
