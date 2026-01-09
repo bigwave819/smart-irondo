@@ -2,7 +2,8 @@ import express from 'express'
 import { 
     VerifyActivationCode,
     ActivateAccount,
-    login
+    login,
+    checkUser
 } from '../controllers/auth.controller.js'
 
 import {
@@ -22,6 +23,7 @@ const router = express.Router()
 router.post("/verify-code", VerifyActivationCode);
 router.post("/activate", ActivateAccount)
 router.post("/login", login);
+router.get('/check/:phone', checkUser)
 
 router.use(ProtectedRoute)
 /* ================= ACTIONS IT REQUIRES TO BE AUTHENTICATED ================= */

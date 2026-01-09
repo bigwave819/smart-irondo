@@ -6,23 +6,39 @@ import jwtToken from '../utils/jwtToken.js'
 
 export const VerifyActivationCode = async (req, res) => {
     try {
-        const { phone, code } = req.body || {}
-        if (!phone || !code)
-            return res.status(400).json({ message: 'Phone and code required' })
-
-        const existingUser = await db.query.user.findFirst({
-            where: eq(user.phone, phone)
-        })
-
-        if (!existingUser || existingUser.activationCode !== code) {
-            return res.status(400).json({ message: 'Invalid code' })
+        const { phone, activationCode } = req.body || {};
+        
+        if (!phone || !activationCode) {
+            return res.status(400).json({ message: 'Phone and code required' });
         }
 
-        res.status(200).json({ message: 'Code verified. proceed to password' })
+        // Drizzle returns an array
+        const users = await db.select().from(user).where(eq(user.phone, phone)).limit(1);
+        const existingUser = users[0]; // Access the first user found
+
+        if (!existingUser) {
+            console.log('❌ No user found with phone:', phone);
+            return res.status(400).json({ message: 'No such User' });
+        }
+
+        // Compare the code (Ensure types match, e.g., String vs Number)
+        if (String(existingUser.activationCode) !== String(activationCode)) {
+            console.log('❌ Invalid Code provided for user:', phone);
+            return res.status(400).json({ message: 'Invalid Code' });
+        }
+
+        console.log('✅ User verified successfully:', phone);
+
+        return res.status(200).json({ 
+            message: 'Code verified. proceed to password',
+            phone: existingUser.phone // Helpful for the frontend storage
+        });
+
     } catch (error) {
-        return res.status(500).json({ message: `Server error: ${error}` })
+        console.error('🔥 Server Error:', error);
+        return res.status(500).json({ message: `Server error: ${error.message}` });
     }
-}
+};
 
 export const ActivateAccount = async (req, res) => {
     try {
@@ -82,3 +98,18 @@ export const login = async (req, res) => {
         return res.status(500).json({ message: `Server error: ${error}` })
     }
 }
+
+
+export const checkUser = async (req, res) => {
+  try {
+    const { phone } = req.params;
+    if (!phone) return res.status(400).json({ message: 'Phone required' });
+
+    const existingUser = await db.select().from(user).where(eq(user.phone, phone));
+    if (!existingUser[0]) return res.status(200).json({ isActive: false });
+
+    res.status(200).json({ isActive: existingUser[0].isActive });
+  } catch (error) {
+    res.status(500).json({ message: `Server error: ${error}` });
+  }
+};
