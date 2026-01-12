@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 // Increased card size by reducing horizontal margins
@@ -17,12 +18,21 @@ interface User {
   };
 }
 
+interface ActionCard {
+  id: string;
+  name: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  path?: string;
+}
+
 const CardData = [
   {
     id: '1',
     name: 'Upload Evidence',
     icon: 'finger-print' as const,
     color: '#3b82f6', // Blue
+    path: '/(homelinks)/upload-evidence',
   },
   {
     id: '2',
@@ -35,6 +45,7 @@ const CardData = [
     name: 'Generate Report',
     icon: 'document-attach' as const,
     color: '#10b981', // Emerald
+    path: '/(homelinks)/generate-report'
   },
   {
     id: '4',
@@ -47,6 +58,8 @@ const CardData = [
 const Index = () => {
   const [user, setUser] = useState<User | null>(null);
 
+  const router = useRouter();
+
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -58,6 +71,15 @@ const Index = () => {
     };
     loadUser();
   }, []);
+
+  const handleNavigation = (path?: string) => {
+  if (!path) {
+    alert("This feature is coming soon 🚀");
+    return;
+  }
+
+  router.push(path as any);
+};
 
   return (
     <ScrollView className="flex-1 bg-slate-50 px-4 pt-14">
@@ -91,7 +113,8 @@ const Index = () => {
           <TouchableOpacity 
             key={card.id} 
             style={{ width: CARD_WIDTH, height: CARD_WIDTH * 1.2 }}
-            className="mb-6 rounded-[40px] border-2 border-white bg-white/80 shadow-xl shadow-slate-200 items-center justify-center p-6"
+            className="mb-6 rounded-xl border-2 border-white bg-white/80 shadow-xl shadow-slate-200 items-center justify-center p-6"
+            onPress={() => handleNavigation(card.path)}
           >
             {/* The "Liquid" Icon Body */}
             <View 

@@ -18,7 +18,7 @@ import { useMutation } from '@tanstack/react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const BACKEND_URL = 'http://10.13.80.154:3000/api/user/activate';
+const BACKEND_URL = 'http://10.129.20.154:3000/api/user/activate';
 
 const passwordSchema = z
   .object({
