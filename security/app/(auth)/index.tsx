@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useRef, useState, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -112,6 +112,8 @@ const OTPPage = () => {
           <Text className="text-4xl font-bold text-gray-900 mb-3 text-center">Verify Your Account</Text>
           <Text className="text-base text-gray-600 text-center">We've sent a code to your phone</Text>
         </View>
+
+        <Link href="/(auth)/Login">Login</Link>
 
         <Controller
           control={control}

@@ -16,7 +16,6 @@ const RootLayout = () => {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        // 1. Check if we already have a session token
         const token = await AsyncStorage.getItem('userToken');
         if (token) {
           setAuthenticated(true);
@@ -54,7 +53,6 @@ const RootLayout = () => {
     } else if (userIsActive) {
       router.replace('/(auth)/Login');
     } else {
-      // New or inactive users go to the landing/OTP start page
       router.replace('/');
     }
   }, [authenticated, userIsActive, loading]);

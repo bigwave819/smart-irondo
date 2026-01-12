@@ -13,12 +13,10 @@ CREATE TABLE "reports" (
 	"report_type" varchar(30),
 	"incident_type" varchar(50),
 	"title" varchar(150),
-	"no_crime" boolean DEFAULT false,
 	"description" text,
 	"status" varchar(20) DEFAULT 'Submitted',
 	"location" jsonb NOT NULL,
-	"patrol_start_time" timestamp,
-	"patrol_end_time" timestamp,
+	"report_date" timestamp DEFAULT now(),
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
@@ -26,7 +24,7 @@ CREATE TABLE "user" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"full_name" varchar(100) NOT NULL,
 	"phone" varchar NOT NULL,
-	"password" text NOT NULL,
+	"password" text,
 	"role" varchar DEFAULT 'user' NOT NULL,
 	"is_Active" boolean DEFAULT false,
 	"activation_code" varchar,

@@ -28,12 +28,10 @@ export const reports = pgTable("reports", {
   reportType: varchar("report_type", { length: 30 }),
   incidentType: varchar("incident_type", { length: 50 }),
   title: varchar("title", { length: 150 }),
-  noCrime: boolean("no_crime").default(false),
   description: text("description"),
   status: varchar("status", { length: 20 }).default("Submitted"),
   location: jsonb("location").notNull(),
-  patrolStartTime: timestamp("patrol_start_time"),
-  patrolEndTime: timestamp("patrol_end_time"),
+  reportDate: timestamp("report_date").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

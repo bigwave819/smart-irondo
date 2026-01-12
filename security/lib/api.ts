@@ -12,7 +12,8 @@ export const api = axios.create({
 
 // Use a request interceptor to inject the token automatically
 api.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem('token');
+  const token = await AsyncStorage.getItem('userToken');
+  console.log("🔑 Token being sent:", token);
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }

@@ -66,6 +66,7 @@ const Login = () => {
       try {
         // Clear old tokens and save new user data
         await AsyncStorage.removeItem('userToken');
+        await AsyncStorage.removeItem('userPhone')
         const userValue = typeof data.user === 'object' ? JSON.stringify(data.user) : data.user;
         await AsyncStorage.setItem('user', userValue);
         await AsyncStorage.setItem('userToken', data.token);

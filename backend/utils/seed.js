@@ -4,28 +4,38 @@ import { user } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 
 export const seedAdmin = async () => {
+  const ADMIN_PHONE = "0798342542";
+  const ADMIN_PASSWORD = "Admin@123";
 
-  const existing = await db
-  .select()
-  .from(user)
-  .where(eq(user.phone, '0781234567'))
-  .limit(1);
+  try {
+    // 1. Correctly check if the array has length
+    const existing = await db
+      .select()
+      .from(user)
+      .where(eq(user.phone, ADMIN_PHONE))
+      .limit(1);
 
-  if (existing) {
-    console.log("✅ Admin already exists, skipping...");
-    return;
+    if (existing.length > 0) {
+      console.log("ℹ️ Admin already exists, skipping...");
+      return;
+    }
+
+    // 2. Hash password
+    const hashedPassword = await bcryptjs.hash(ADMIN_PASSWORD, 10);
+
+    // 3. Insert using the correct table variable (user)
+    await db.insert(user).values({
+      fullName: "System Administrator",
+      phone: ADMIN_PHONE,
+      password: hashedPassword,
+      role: "admin",
+      isActive: true,
+      location: null,
+    });
+
+    console.log("✅ Admin user seeded successfully");
+  } catch (error) {
+    console.error("❌ Error seeding admin:", error);
+    process.exit(1);
   }
-
-  const hashedPassword = await bcryptjs.hash("Admin@123", 10);
-
-  await db.insert(userTable).values({
-    fullName: "System Administrator",
-    phone: "0798342542",
-    password: hashedPassword,
-    role: "admin",
-    isActive: true,
-    location: null, // ✅ allowed
-  });
-
-  console.log("✅ Admin user seeded successfully");
 };

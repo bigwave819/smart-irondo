@@ -1,38 +1,47 @@
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useApi } from "@/lib/api"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useApi } from "@/lib/api";
 import { Report } from '@/types';
 
+type CreateReportPayload = Omit<Report, "id" | "reportedBy" | "status" | "createdAt">;
 
-const report = () => {
-    const api = useApi()
-    const queryClient = useQueryClient()
+const useReport = () => {
+  const api = useApi();
+  const queryClient = useQueryClient();
 
-    const { data, isLoading, isError } = useQuery({
-        queryKey: ['reports'],
-        queryFn: async () => {
-            const { data } = await api.get<Report[]>(`/reports/view`);
-            return data
-        }
-    })
+  const { data, isLoading, isError } = useQuery<Report[]>({
+    queryKey: ['reports'],
+    queryFn: async () => {
+      const { data } = await api.get<Report[]>(`/reports/view`);
+      return data;
+    }
+  });
 
-    const createReportMutation = useMutation({
-        mutationFn: async (newReport: Omit<Report, "id">) => {
-            const { data } = await api.post<Report>(`/report/create`, newReport);
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['reports'] });
-        },
-    });
+  const createReportMutation = useMutation<Report, any, CreateReportPayload>({
+    mutationFn: async (newReport: CreateReportPayload) => {
+      // Log the full URL being used
+      const fullUrl = `${api.defaults.baseURL}/reports/create`;
+      console.log(`🚀 Request URL: ${fullUrl}`);
+      console.log("📤 Sending report payload:", newReport);
+      const { data } = await api.post<Report>(`/reports/create`, newReport);
+      console.log("📥 Response from backend:", data); // ✅ log
+      return data;
+    },
+    onSuccess: (data) => {
+      console.log("✅ Report created successfully:", data);
+      queryClient.invalidateQueries({ queryKey: ['reports'] });
+    },
+    onError: (error) => {
+      console.error("❌ Error creating report:", error);
+    }
+  });
 
-    return {
+  return {
     reports: data ?? [],
     isLoading,
     isError,
     createReport: createReportMutation.mutate,
     isCreating: createReportMutation.isPending,
   };
+};
 
-}
-
-export default report
+export default useReport;

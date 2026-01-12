@@ -10,26 +10,33 @@ export const ProtectedRoute = async (req, res, next) => {
         const token = req.headers.authorization?.split(" ")[1];
 
         if (!token) {
-            return res.status(401).json({ message: "not token provided" })
+            return res.status(401).json({ message: "No token provided" });
         }
 
-        const decoded = jwt.verify(token, ENV.JWT_SECRET)
+        const decoded = jwt.verify(token, ENV.JWT_SECRET);
 
-        const user = await db.query.user.findFirst({
-            where: eq(UserTable.id, decoded.id),
-            columns: {
-                password: false
-            }
+        // Use proper Drizzle select syntax
+        const [user] = await db.select({
+            id: UserTable.id,
+            fullName: UserTable.fullName,
+            phone: UserTable.phone,
+            role: UserTable.role,
+            location: UserTable.location
         })
+        .from(UserTable)
+        .where(eq(UserTable.id, decoded.id))
+        .limit(1)
 
         if (!user) return res.status(401).json({ message: "User not found" });
 
         req.user = user;
         next();
     } catch (error) {
-        return res.status(401).json({ message: "Invalid or expired token" });
+        console.log(error);
+        return res.status(401).json({ message: "Invalid or expired token", error: error.message });
     }
-}
+};
+
 
 export const adminOnly = (req, res, next) => {
   if (!req.user) {

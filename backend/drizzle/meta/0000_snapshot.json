@@ -1,5 +1,5 @@
 {
-  "id": "946e1e4a-c4e4-41fe-b760-ae43415f99b7",
+  "id": "fc732472-c3bd-4ca6-a424-ac4f8fa8e625",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -115,13 +115,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "no_crime": {
-          "name": "no_crime",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
         "description": {
           "name": "description",
           "type": "text",
@@ -141,17 +134,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "patrol_start_time": {
-          "name": "patrol_start_time",
+        "report_date": {
+          "name": "report_date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
-        },
-        "patrol_end_time": {
-          "name": "patrol_end_time",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "created_at": {
           "name": "created_at",
@@ -209,7 +197,7 @@
           "name": "password",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "role": {
           "name": "role",

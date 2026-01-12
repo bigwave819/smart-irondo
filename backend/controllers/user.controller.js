@@ -89,52 +89,33 @@ export const uploadEvidence = async (req, res) => {
 export const generateReport = async (req, res) => {
   try {
     const reportedBy = req.user.id;
-    const {
-      reportType,
-      noCrime,
-      incidentType,
-      title,
-      description,
-      location,
-      patrolStartTime,
-      patrolEndTime,
-    } = req.body;
+    const { reportType, incidentType, title, description, location, reportDate } = req.body;
 
-    if (!reportType || !description || !location || !title) {
+    if (!reportType || !title || !description || !location || !reportDate) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // Default logic for no-crime
-    const finalIncidentType = noCrime ? "None" : incidentType;
-
+    // FIX: Ensure location is an object and reportDate is a proper Date object
     const [newReport] = await db
       .insert(reports)
       .values({
         reportedBy,
         reportType,
-        noCrime,
-        incidentType: finalIncidentType,
+        incidentType: incidentType || "None",
         title,
         description,
-        location,
-        patrolStartTime,
-        patrolEndTime,
-        status: noCrime ? "Submitted" : "Pending",
+        location, // Drizzle handles JSONB objects automatically
+        reportDate: new Date(reportDate), // Convert ISO string to JS Date
+        status: (reportType === "Crime" || reportType === "Emergency") ? "Pending" : "Submitted",
       })
       .returning();
 
-    return res.status(201).json({
-      message: "Report created successfully",
-      report: newReport,
-    });
+    return res.status(201).json({ message: "Report created successfully", report: newReport });
   } catch (error) {
-    return res.status(500).json({
-      message: "Server error while creating report",
-      error: error.message,
-    });
+    console.error("🔥 DB Insert Error:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
 export const downloadReport = async (req, res) => {
   try {
     const { id } = req.params

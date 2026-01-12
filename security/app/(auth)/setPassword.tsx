@@ -58,7 +58,6 @@ const SetPassword = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: setPasswordApi,
     onSuccess: async () => {
-      await AsyncStorage.removeItem('userPhone');
       Alert.alert('Success', 'Password updated successfully!', [
         { text: 'Login', onPress: () => router.push('/(auth)/Login') }
       ]);
@@ -172,8 +171,8 @@ const SetPassword = () => {
       {/* Submit Button */}
       <View className="mt-6">
         <TouchableOpacity
-          className={`py-4 rounded-2xl items-center justify-center shadow-lg ${
-            isPending ? 'bg-indigo-300' : 'bg-indigo-600 shadow-indigo-200'
+          className={`py-4 rounded-full items-center justify-center shadow-lg ${
+            isPending ? 'bg-blue-300' : 'bg-blue-500 shadow-indigo-200'
           }`}
           onPress={handleSubmit(onSubmit)}
           disabled={isPending}

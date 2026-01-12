@@ -82,7 +82,7 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid Credentials' })
         }
 
-        const token = jwtToken({ id: existingUser.id, role: existingUser.role })
+        const token = jwtToken({ id: existingUsers.id, role: existingUsers.role })
 
         res.status(200).json({
             token,
