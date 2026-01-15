@@ -11,12 +11,14 @@ import {
     downloadEvidence,
     generateReport,
     downloadReport,
-    getReportsUploadedByCertainUser
+    getReportsUploadedByCertainUser,
+    getEvidenceUploadedByCertainUser
 } from '../controllers/user.controller.js'
 
 import {
     ProtectedRoute
 } from '../middlewares/auth.mddleware.js'
+import { upload } from '../middlewares/multer.middleware.js'
 
 const router = express.Router()
 
@@ -31,7 +33,8 @@ router.use(ProtectedRoute)
 router.get("/reports/:id/download", downloadReport);
 router.get("/evidence/:id/download", downloadEvidence);
 router.post("/reports/create", generateReport);
-router.post("/evidence/create", uploadEvidence);
+router.post("/evidence/create", upload.single("url"), uploadEvidence);
+router.get('/evidences', getEvidenceUploadedByCertainUser)
 router.get("/reports", getReportsUploadedByCertainUser)
 
 

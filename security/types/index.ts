@@ -16,3 +16,12 @@ export interface Report {
   };
   reportDate: Date
 }
+
+export interface Evidence {
+  id: number,
+  reportId: number,
+  uploadedBy: number,
+  url: string
+  type: string
+  createdAt: Date | null 
+}

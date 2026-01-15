@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import EvidenceModal from '@/components/EvidenceModal';
 
 interface EvidenceFormData {
-  report: string;
+  reportId: string;
   url: string;
 }
 
@@ -14,15 +14,11 @@ const UploadEvidence = () => {
   const [evidences, setEvidences] = useState<EvidenceFormData[]>([]);
   const [showEvidenceForm, setShowEvidenceForm] = useState(false);
   const [evidenceForm, setEvidenceForm] = useState<EvidenceFormData>({
-    report: '',
+    reportId: '',
     url: ''
   });
 
-  const handleSave = () => {
-    setEvidences([...evidences, evidenceForm]);
-    setEvidenceForm({ report: '', url: '' }); // Reset
-    setShowEvidenceForm(false);
-  };
+
 
   return (
     <View className='flex-1 bg-white px-5 pt-12'>
@@ -54,9 +50,8 @@ const UploadEvidence = () => {
       {/* MODAL COMPONENT */}
       <EvidenceModal 
         evidenceForm={evidenceForm}
-        isVisble={showEvidenceForm}
+        isVisible={showEvidenceForm}
         onClose={() => setShowEvidenceForm(false)}
-        onSave={handleSave}
         setEvidenceForm={setEvidenceForm}
       />
     </View>

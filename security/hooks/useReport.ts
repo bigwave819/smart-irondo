@@ -14,8 +14,8 @@ const useReport = () => {
       try {
         const response = await api.get<{ reports: Report[] }>(`/reports`);
         return response.data.reports;
-      } catch (err) {
-        console.error("📡 API FETCH ERROR:", err);
+      } catch (err: any) {
+        console.error("📡 API FETCH ERROR:", err.message);
         throw err;
       }    
     },
