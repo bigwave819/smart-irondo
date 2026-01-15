@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { desc, eq } from "drizzle-orm"
 import { evidence, reports } from "../db/schema.js";
 import { user } from "../db/schema.js";
 import { db } from '../db/conn.js'
@@ -125,9 +125,10 @@ export const getAllAbanyerondo = async (_, res) => {
 
 export const getAllReports = async (_, res) => {
     try {
-        const data = await db.query.reports.findMany({
-            orderBy: [desc(reports.createdAt)],
-        });
+        const data = await db
+                            .select()
+                            .from(reports)
+                            .orderBy(desc(reports.createdAt))
 
         return res.status(200).json({
             message: "Reports retrieved successfully",

@@ -10,7 +10,7 @@ import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity
 import * as z from 'zod';
 
 const OTP_LENGTH = 6;
-const BACKEND_URL = 'http://10.129.20.154:3000/api/user/verify-code';
+const BACKEND_URL = 'http://10.222.101.154:3000/api/user/verify-code';
 
 const otpSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),

@@ -11,23 +11,22 @@ const useReport = () => {
   const { data, isLoading, isError } = useQuery<Report[]>({
     queryKey: ['reports'],
     queryFn: async () => {
-      const { data } = await api.get<Report[]>(`/reports/view`);
-      return data;
-    }
+      try {
+        const response = await api.get<{ reports: Report[] }>(`/reports`);
+        return response.data.reports;
+      } catch (err) {
+        console.error("📡 API FETCH ERROR:", err);
+        throw err;
+      }    
+    },
   });
 
   const createReportMutation = useMutation<Report, any, CreateReportPayload>({
     mutationFn: async (newReport: CreateReportPayload) => {
-      // Log the full URL being used
-      const fullUrl = `${api.defaults.baseURL}/reports/create`;
-      console.log(`🚀 Request URL: ${fullUrl}`);
-      console.log("📤 Sending report payload:", newReport);
       const { data } = await api.post<Report>(`/reports/create`, newReport);
-      console.log("📥 Response from backend:", data); // ✅ log
       return data;
     },
-    onSuccess: (data) => {
-      console.log("✅ Report created successfully:", data);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] });
     },
     onError: (error) => {

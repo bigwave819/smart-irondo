@@ -10,7 +10,8 @@ import {
     uploadEvidence,
     downloadEvidence,
     generateReport,
-    downloadReport
+    downloadReport,
+    getReportsUploadedByCertainUser
 } from '../controllers/user.controller.js'
 
 import {
@@ -31,6 +32,7 @@ router.get("/reports/:id/download", downloadReport);
 router.get("/evidence/:id/download", downloadEvidence);
 router.post("/reports/create", generateReport);
 router.post("/evidence/create", uploadEvidence);
+router.get("/reports", getReportsUploadedByCertainUser)
 
 
 export default router

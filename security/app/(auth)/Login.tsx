@@ -22,7 +22,7 @@ import { api } from '@/lib/api';
 // ===================
 // CONFIG & SCHEMA
 // ===================
-const BACKEND_URL = 'http://10.129.20.154:3000/api/user/login'; // Updated to /login
+const BACKEND_URL = 'http://10.222.101.154:3000/api/user/login'; // Updated to /login
 
 const loginSchema = z.object({
   phone: z

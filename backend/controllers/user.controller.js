@@ -1,6 +1,6 @@
 import { db } from "../db/conn.js";
 import { evidence, reports } from "../db/schema.js";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import cloudinary from "../config/cloudinary.js";
 import PDFDocument from "pdfkit"
 import axios from 'axios'
@@ -214,3 +214,21 @@ export const downloadEvidence = async (req, res) => {
   }
 }
 
+export const getReportsUploadedByCertainUser = async (req, res) => {
+  try {
+
+    const userReports = await db
+      .select()
+      .from(reports)
+      .orderBy(desc(reports.createdAt));
+
+    return res.status(200).json({
+      message: "Reports retrieved successfully",
+      total: userReports.length,
+      reports: userReports,
+    });
+  } catch (error) {
+    console.error("Error fetching user reports:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}

@@ -2,9 +2,8 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import EvidenceModal from '@/components/EvidenceModal'; // Adjust path as needed
+import EvidenceModal from '@/components/EvidenceModal';
 
-// Define the interface for your state
 interface EvidenceFormData {
   report: string;
   url: string;
