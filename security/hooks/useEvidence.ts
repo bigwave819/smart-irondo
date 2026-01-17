@@ -1,17 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useApi } from "@/lib/api";
-import { Evidence } from "@/types";
+import { EvidenceWithReportAndUser } from "@/types";
 
 export const useEvidence = () => {
   const api = useApi();
   const queryClient = useQueryClient();
 
   // Fetch all evidence
-  const { data, isLoading, isError } = useQuery<Evidence[]>({
+  const { data, isLoading, isError } = useQuery<EvidenceWithReportAndUser[]>({
     queryKey: ['evidences'],
     queryFn: async () => {
-      const response = await api.get('/evidences');
-      return response.data;
+      const { data } = await api.get('/evidences');
+      return data;
+      
     }
   });
 

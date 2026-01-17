@@ -17,11 +17,24 @@ export interface Report {
   reportDate: Date
 }
 
-export interface Evidence {
-  id: number,
-  reportId: number,
-  uploadedBy: number,
-  url: string
-  type: string
-  createdAt: Date | null 
+export interface EvidenceWithReportAndUser {
+  id: number;
+  reportId: number;
+  reportTitle: string;
+  reportType: string;
+  uploadedBy: number;
+  userName: string;
+  userPhone?: string;
+  url: string;
+  type: 'image' | 'video';
+  createdAt: Date | null;
 }
+
+// export interface Evidence {
+//   id: number;
+//   reportId: number;
+//   uploadedBy: number;
+//   url: string;
+//   type: 'image' | 'video'; // stricter than string
+//   createdAt: Date | null;
+// }

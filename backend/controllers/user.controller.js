@@ -1,5 +1,5 @@
 import { db } from "../db/conn.js";
-import { evidence, reports } from "../db/schema.js";
+import { evidence, reports, user } from "../db/schema.js";
 import { eq, desc } from "drizzle-orm";
 import cloudinary from "../config/cloudinary.js";
 import PDFDocument from "pdfkit"
@@ -79,19 +79,20 @@ export const generateReport = async (req, res) => {
     return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 export const downloadReport = async (req, res) => {
   try {
     const { id } = req.params
 
-    const report = await db.query.reports.findFirst({
-      where: eq(reports.id, Number(id)),
-      with: {
-        reportedBy: true
-      }
-    })
+    // Fetch the report from the database
+    const [report] = await db
+      .select()
+      .from(reports)
+      .where(eq(reports.id, Number(id)))
+      .limit(1);
 
     if (!report) {
-      return res.status(404).json({ message: "Report not found" })
+      return res.status(404).json({ message: "Report not found" });
     }
 
     const doc = new PDFDocument({ margin: 50 })
@@ -135,6 +136,9 @@ export const downloadReport = async (req, res) => {
 
     doc.end();
 
+    console.log('downloaded successfully');
+    
+
   } catch (error) {
     res.status(500).json({
       message: "Failed to download report",
@@ -147,9 +151,11 @@ export const downloadEvidence = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const file = await db.query.evidence.findFirst({
-      where: eq(evidence.id, Number(id)),
-    });
+    const [file] = await db
+                        .select()
+                        .from(reports)
+                        .where(eq(evidence.id, Number(id)))
+                        .limit(1)
 
     if (!file) {
       return res.status(404).json({ message: "Evidence not found" });
@@ -199,17 +205,26 @@ export const getReportsUploadedByCertainUser = async (req, res) => {
 export const getEvidenceUploadedByCertainUser = async (req, res) => {
   try {
     const userEvidence = await db
-      .select()
+      .select({
+        evidenceId: evidence.id,
+        reportId: evidence.reportId,
+        evidenceUrl: evidence.url,
+        evidenceType: evidence.type,
+        uploadedAt: evidence.createdAt,
+        reportTitle: reports.title,
+        reportType: reports.reportType,
+        userName: user.fullName,
+        userPhone: user.phone,
+        type: evidence.type
+      })
       .from(evidence)
+      .leftJoin(reports, eq(evidence.reportId, reports.id))
+      .leftJoin(user, eq(evidence.uploadedBy, user.id))
       .orderBy(desc(evidence.createdAt));
 
-    return res.status(200).json({
-      message: "Evidence retrieved successfully",
-      total: userEvidence.length,
-      reports: userEvidence,
-    });
+    res.status(200).json(userEvidence);
   } catch (error) {
-    console.error("Error fetching user Evidence:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    console.error('Error fetching user Evidence:', error);
+    res.status(500).json({ message: 'Failed to fetch user evidence', error: error.message });
   }
-}
+};

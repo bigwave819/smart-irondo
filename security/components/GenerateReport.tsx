@@ -1,9 +1,12 @@
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import AddReportModal from '@/components/AddReportModal';
 import { Report } from '@/types';
+import { Directory, File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ReportsGridProps {
   isLoading: boolean;
@@ -16,6 +19,99 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
   const [showReportForm, setShowReportForm] = useState(false);
 
   const handleCloseModal = () => setShowReportForm(false);
+
+  const handleDownload = async (reportId: number, title: string) => {
+    console.log('🚀 [STEP 1] Starting download process...');
+    console.log('📋 Report ID:', reportId);
+    console.log('📄 Report Title:', title);
+    
+    try {
+      // Get the auth token
+      console.log('🔐 [STEP 1.5] Retrieving auth token...');
+      const token = await AsyncStorage.getItem('userToken');
+      console.log('🔑 Token exists?', !!token);
+      console.log('🔑 Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
+      
+      if (!token) {
+        console.error('❌ No authentication token found!');
+        Alert.alert('Authentication Error', 'Please log in again');
+        return;
+      }
+      
+      // Construct the download URL
+      const downloadUrl = `${process.env.EXPO_PUBLIC_API_URL}/reports/${reportId}/download`;
+      console.log('🌐 [STEP 2] Download URL constructed:', downloadUrl);
+      console.log('🔑 API URL from env:', process.env.EXPO_PUBLIC_API_URL);
+      
+      // Create the destination directory only if it doesn't exist
+      console.log('📁 [STEP 3] Creating destination directory...');
+      console.log('📍 Paths.document:', Paths.document);
+      
+      const destination = new Directory(Paths.document, 'reports');
+      console.log('📂 Destination path:', destination.uri);
+      console.log('✅ Directory exists?', destination.exists);
+      
+      if (!destination.exists) {
+        console.log('🔨 Creating directory...');
+        destination.create();
+        console.log('✅ Directory created successfully');
+      } else {
+        console.log('ℹ️ Directory already exists, skipping creation');
+      }
+
+      // Download the file with authentication headers
+      console.log('⬇️ [STEP 4] Starting file download with auth...');
+      console.log('📥 Downloading from URL:', downloadUrl);
+      console.log('💾 Saving to directory:', destination.uri);
+      console.log('🔐 Using Bearer token authentication');
+      
+      const downloadedFile = await File.downloadFileAsync(downloadUrl, destination, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      
+      console.log('✅ [STEP 5] Download complete!');
+      console.log('📄 Downloaded file URI:', downloadedFile.uri);
+      console.log('✔️ File exists?', downloadedFile.exists);
+      console.log('📊 File size:', downloadedFile.size);
+
+      // Check if sharing is available
+      console.log('🔍 [STEP 6] Checking if sharing is available...');
+      const isAvailable = await Sharing.isAvailableAsync();
+      console.log('📤 Sharing available?', isAvailable);
+      
+      if (isAvailable) {
+        console.log('📨 [STEP 7] Opening share dialog...');
+        await Sharing.shareAsync(downloadedFile.uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Save Report',
+          UTI: 'com.adobe.pdf'
+        });
+        console.log('✅ Share dialog completed');
+      } else {
+        console.log('ℹ️ Sharing not available, showing alert instead');
+        Alert.alert(
+          "Download Complete",
+          `Report saved successfully to: ${downloadedFile.uri}`
+        );
+      }
+
+      console.log('🎉 [COMPLETE] Download process finished successfully!');
+
+    } catch (error: any) {
+      console.error("❌ [ERROR] Download failed!", error.message);
+      console.error("🔴 Error type:", error?.constructor?.name);
+      console.error("🔴 Error message:", error instanceof Error ? error.message : 'Unknown error');
+      console.error("🔴 Full error object:", error);
+      console.error("🔴 Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+      
+      Alert.alert(
+        "Download Failed", 
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+    }
+  };
 
   const Header = () => (
     <View className="bg-white pb-4">
@@ -84,7 +180,10 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
               </Text>
             </View>
 
-            <TouchableOpacity className="p-4 bg-blue-50 rounded-full">
+            <TouchableOpacity
+              className="p-4 bg-blue-50 rounded-full"
+              onPress={() => handleDownload(item.id, item.title)}
+            >
                <Ionicons name="download-outline" size={20} color="#3b82f6" />
             </TouchableOpacity>
           </View>
