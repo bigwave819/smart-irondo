@@ -1,9 +1,11 @@
 import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, SafeAreaView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import EvidenceModal from '@/components/EvidenceModal';
 import { useEvidence } from '@/hooks/useEvidence';
+import BottomSheet from '@gorhom/bottom-sheet';
+import EvidenceView from '@/components/EvidenceView';
 
 interface EvidenceFormData {
   reportId: string;
@@ -13,12 +15,22 @@ interface EvidenceFormData {
 const UploadEvidence = () => {
   const router = useRouter();
   const [showEvidenceForm, setShowEvidenceForm] = useState(false);
+  const [selectedEvidence, setSelectedEvidence] = useState<any>(null);
   const [evidenceForm, setEvidenceForm] = useState<EvidenceFormData>({
     reportId: '',
     url: ''
   });
 
   const { evidences, isError, isLoading } = useEvidence();
+  
+  // Bottom sheet ref
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // Function to open bottom sheet with selected evidence
+  const handleOpenBottomSheet = (item: any) => {
+    setSelectedEvidence(item);
+    bottomSheetRef.current?.expand();
+  };
 
   if (isError) {
     return (
@@ -85,7 +97,7 @@ const UploadEvidence = () => {
   );
 
   return (
-    <SafeAreaView className='flex-1 bg-white'>
+    <View className='flex-1 bg-white'>
       <View className="flex-1 px-5 pt-4">
         <FlatList
           data={evidences}
@@ -119,6 +131,7 @@ const UploadEvidence = () => {
               <TouchableOpacity 
                 activeOpacity={0.6}
                 className='h-12 w-12 rounded-full bg-slate-50 border border-slate-100 flex justify-center items-center'
+                onPress={() => handleOpenBottomSheet(item)}
               >
                 <Ionicons name='chevron-forward' size={20} color="#3b82f6" />
               </TouchableOpacity>
@@ -127,13 +140,20 @@ const UploadEvidence = () => {
         />
       </View>
 
+      {/* MODALS */}
       <EvidenceModal
         evidenceForm={evidenceForm}
         isVisible={showEvidenceForm}
         onClose={() => setShowEvidenceForm(false)}
         setEvidenceForm={setEvidenceForm}
       />
-    </SafeAreaView>
+
+      {/* BOTTOM SHEET */}
+      <EvidenceView 
+        bottomSheetRef={bottomSheetRef} 
+        evidence={selectedEvidence}
+      />
+    </View>
   );
 };
 

@@ -21,95 +21,82 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
   const handleCloseModal = () => setShowReportForm(false);
 
   const handleDownload = async (reportId: number, title: string) => {
-    console.log('🚀 [STEP 1] Starting download process...');
+    console.log('🚀 Starting download...');
     console.log('📋 Report ID:', reportId);
-    console.log('📄 Report Title:', title);
     
     try {
-      // Get the auth token
-      console.log('🔐 [STEP 1.5] Retrieving auth token...');
       const token = await AsyncStorage.getItem('userToken');
-      console.log('🔑 Token exists?', !!token);
-      console.log('🔑 Token preview:', token ? `${token.substring(0, 20)}...` : 'No token');
       
       if (!token) {
-        console.error('❌ No authentication token found!');
         Alert.alert('Authentication Error', 'Please log in again');
         return;
       }
       
-      // Construct the download URL
       const downloadUrl = `${process.env.EXPO_PUBLIC_API_URL}/reports/${reportId}/download`;
-      console.log('🌐 [STEP 2] Download URL constructed:', downloadUrl);
-      console.log('🔑 API URL from env:', process.env.EXPO_PUBLIC_API_URL);
+      console.log('🌐 Download URL:', downloadUrl);
       
-      // Create the destination directory only if it doesn't exist
-      console.log('📁 [STEP 3] Creating destination directory...');
-      console.log('📍 Paths.document:', Paths.document);
-      
+      // Create destination directory
       const destination = new Directory(Paths.document, 'reports');
-      console.log('📂 Destination path:', destination.uri);
-      console.log('✅ Directory exists?', destination.exists);
       
       if (!destination.exists) {
-        console.log('🔨 Creating directory...');
         destination.create();
-        console.log('✅ Directory created successfully');
-      } else {
-        console.log('ℹ️ Directory already exists, skipping creation');
+        console.log('✅ Directory created');
       }
 
-      // Download the file with authentication headers
-      console.log('⬇️ [STEP 4] Starting file download with auth...');
-      console.log('📥 Downloading from URL:', downloadUrl);
-      console.log('💾 Saving to directory:', destination.uri);
-      console.log('🔐 Using Bearer token authentication');
-      
+      // Delete all existing files in the directory to avoid conflicts
+      console.log('🗑️ Cleaning up old files...');
+      const existingFiles = destination.list();
+      for (const file of existingFiles) {
+        try {
+          await file.delete();
+          console.log('Deleted:', file.uri);
+        } catch (e) {
+          console.log('Could not delete file:', e);
+        }
+      }
+
+      // Download the file - let the server determine the filename
+      console.log('⬇️ Downloading...');
       const downloadedFile = await File.downloadFileAsync(downloadUrl, destination, {
         headers: {
           'Authorization': `Bearer ${token}`,
         }
       });
       
-      console.log('✅ [STEP 5] Download complete!');
-      console.log('📄 Downloaded file URI:', downloadedFile.uri);
-      console.log('✔️ File exists?', downloadedFile.exists);
-      console.log('📊 File size:', downloadedFile.size);
+      console.log('✅ Download complete!');
+      console.log('📄 File URI:', downloadedFile.uri);
+      console.log('📊 File size:', downloadedFile.size, 'bytes');
 
-      // Check if sharing is available
-      console.log('🔍 [STEP 6] Checking if sharing is available...');
+      // Share the file
       const isAvailable = await Sharing.isAvailableAsync();
-      console.log('📤 Sharing available?', isAvailable);
       
       if (isAvailable) {
-        console.log('📨 [STEP 7] Opening share dialog...');
         await Sharing.shareAsync(downloadedFile.uri, {
           mimeType: 'application/pdf',
-          dialogTitle: 'Save Report',
+          dialogTitle: `Save ${title}`,
           UTI: 'com.adobe.pdf'
         });
-        console.log('✅ Share dialog completed');
       } else {
-        console.log('ℹ️ Sharing not available, showing alert instead');
         Alert.alert(
           "Download Complete",
-          `Report saved successfully to: ${downloadedFile.uri}`
+          `Report saved successfully!`
         );
       }
 
-      console.log('🎉 [COMPLETE] Download process finished successfully!');
-
     } catch (error: any) {
-      console.error("❌ [ERROR] Download failed!", error.message);
-      console.error("🔴 Error type:", error?.constructor?.name);
-      console.error("🔴 Error message:", error instanceof Error ? error.message : 'Unknown error');
-      console.error("🔴 Full error object:", error);
-      console.error("🔴 Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+      console.error("❌ Download failed:", error?.message);
       
-      Alert.alert(
-        "Download Failed", 
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
+      let errorMessage = "Failed to download report";
+      
+      if (error?.message?.includes('Network')) {
+        errorMessage = "Network error. Check your connection.";
+      } else if (error?.message?.includes('401') || error?.message?.includes('403')) {
+        errorMessage = "Authentication failed. Please log in again.";
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert("Download Failed", errorMessage);
     }
   };
 
@@ -176,7 +163,7 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
                 {item.reportType} • {item.status}
               </Text>
               <Text className="text-gray-400 text-[10px] mt-1">
-                {/* 📍 {item.location.sector}, {item.location.district} */}
+                📍 {item.location?.sector || 'N/A'}, {item.location?.district || 'N/A'}
               </Text>
             </View>
 

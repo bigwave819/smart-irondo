@@ -17,6 +17,9 @@ api.interceptors.request.use(async (config) => {
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  console.log(BASE_URL);
+  
   return config;
 }, (error) => {
   return Promise.reject(error);

@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
@@ -18,7 +18,7 @@ import useReport from '@/hooks/useReport';
 import { useEvidence } from '@/hooks/useEvidence';
 
 interface EvidenceFormData {
-  url: string;        // this is the file URI
+  url: string; 
   reportId: string;
 }
 
@@ -75,6 +75,8 @@ const EvidenceModal = ({
       }
     );
   };
+
+  
 
   return (
     <Modal visible={isVisible} animationType="slide" transparent onRequestClose={onClose}>
