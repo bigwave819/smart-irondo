@@ -12,7 +12,9 @@ import {
     generateReport,
     downloadReport,
     getReportsUploadedByCertainUser,
-    getEvidenceUploadedByCertainUser
+    getEvidenceUploadedByCertainUser,
+    sendSupportNotifications,
+    getNotifications
 } from '../controllers/user.controller.js'
 
 import {
@@ -36,6 +38,8 @@ router.post("/reports/create", generateReport);
 router.post("/evidence/create", upload.single("url"), uploadEvidence);
 router.get('/evidences', getEvidenceUploadedByCertainUser)
 router.get("/reports", getReportsUploadedByCertainUser)
+router.post('/send', sendSupportNotifications),
+router.get('/notifications', getNotifications)
 
 
 export default router

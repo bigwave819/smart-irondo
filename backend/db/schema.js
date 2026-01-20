@@ -22,6 +22,14 @@ export const user = pgTable("user", {
   createdAt: timestamp("created_at").defaultNow(),
 })
 
+export const notifications = pgTable('notifications', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  senderId: text('sender_id').notNull(),
+  createdAt: timestamp("created_at").defaultNow()
+})
+
 export const reports = pgTable("reports", {
   id: serial("id").primaryKey(),
   reportedBy: integer("reported_by").references(() => user.id),

@@ -22,7 +22,7 @@ import { api } from '@/lib/api';
 // ===================
 // CONFIG & SCHEMA
 // ===================
-const BACKEND_URL = `${process.env.EXPO_PUBLIC_API_URL}/login`; // Updated to /login
+const BACKEND_URL = `${process.env.EXPO_PUBLIC_API_URL}/login`;
 
 const loginSchema = z.object({
   phone: z
@@ -111,7 +111,7 @@ const Login = () => {
           render={({ field: { onChange, value } }) => (
             <View className="mb-4">
               <View className="relative">
-                <View className="absolute left-4 top-4 z-10">
+                <View className="absolute left-4 top-5 z-10">
                   <Ionicons name="call-outline" size={20} color="#6b7280" />
                 </View>
                 <TextInput
@@ -121,7 +121,7 @@ const Login = () => {
                   keyboardType="phone-pad"
                   editable={!isPending}
                   placeholderTextColor="#9ca3af"
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl py-4 pl-12 pr-4 text-lg text-gray-900"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-full py-4 pl-12 pr-4 text-lg text-gray-900"
                 />
               </View>
               {errors.phone && <Text className="text-red-500 mt-1 ml-2">{errors.phone.message}</Text>}
@@ -136,7 +136,7 @@ const Login = () => {
           render={({ field: { onChange, value } }) => (
             <View className="mb-4">
               <View className="relative">
-                <View className="absolute left-4 top-4 z-10">
+                <View className="absolute left-4 top-5 z-10">
                   <Ionicons name="lock-closed-outline" size={20} color="#6b7280" />
                 </View>
                 <TextInput
@@ -146,7 +146,7 @@ const Login = () => {
                   secureTextEntry={!showPassword}
                   editable={!isPending}
                   placeholderTextColor="#9ca3af"
-                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl py-4 pl-12 pr-12 text-lg text-gray-900"
+                  className="w-full bg-gray-50 border-2 border-gray-100 rounded-full py-4 pl-12 pr-12 text-lg text-gray-900"
                 />
                 <TouchableOpacity
                   className="absolute right-4 top-4 z-10"
@@ -170,7 +170,7 @@ const Login = () => {
 
         {/* Login Button */}
         <TouchableOpacity
-          className={`rounded-2xl items-center py-4 shadow-lg ${
+          className={`rounded-full items-center py-4 shadow-lg ${
             isPending ? 'bg-blue-300' : 'bg-blue-500 shadow-blue-200'
           }`}
           onPress={handleSubmit(onSubmit)}

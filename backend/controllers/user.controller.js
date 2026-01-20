@@ -1,9 +1,10 @@
 import { db } from "../db/conn.js";
-import { evidence, reports, user } from "../db/schema.js";
-import { eq, desc } from "drizzle-orm";
+import { evidence, notifications, reports, user } from "../db/schema.js";
+import { eq, desc, ne } from "drizzle-orm";
 import cloudinary from "../config/cloudinary.js";
 import PDFDocument from "pdfkit"
 import axios from 'axios'
+import fetch from "node-fetch";
 import streamifier from "streamifier";
 
 /* ===========================
@@ -137,7 +138,7 @@ export const downloadReport = async (req, res) => {
     doc.end();
 
     console.log('downloaded successfully');
-    
+
 
   } catch (error) {
     res.status(500).json({
@@ -152,10 +153,10 @@ export const downloadEvidence = async (req, res) => {
     const { id } = req.params;
 
     const [file] = await db
-                        .select()
-                        .from(reports)
-                        .where(eq(evidence.id, Number(id)))
-                        .limit(1)
+      .select()
+      .from(reports)
+      .where(eq(evidence.id, Number(id)))
+      .limit(1)
 
     if (!file) {
       return res.status(404).json({ message: "Evidence not found" });
@@ -226,5 +227,78 @@ export const getEvidenceUploadedByCertainUser = async (req, res) => {
   } catch (error) {
     console.error('Error fetching user Evidence:', error);
     res.status(500).json({ message: 'Failed to fetch user evidence', error: error.message });
+  }
+};
+
+export const sendSupportNotifications = async (req, res) => {
+  try {
+    const senderId = req.user.id
+    const { message } = req.body
+
+    if (!senderId) {
+      return res.status(401).json({ message: 'Unauthorized to perform this activity' })
+    }
+
+    if (!message) {
+      return res.status(400).json({ message: 'All fields are required' })
+    }
+
+    const receivers = await db
+      .select()
+      .from(user)
+      .where(
+        ne(user.role, "admin")
+      );
+
+    const filtered = receivers.filter(
+      u => u.id !== senderId && u.pushToken
+    );
+
+    const tokens = filtered.map(u => u.pushToken);
+
+    await db.insert(notifications)
+      .values({
+        title: 'Ask for Support',
+        message,
+        senderId
+      })
+
+    const payload = tokens.map(token => ({
+      to: token,
+      title: "🚨 Support Request",
+      body: message
+    }));
+
+    await fetch("exp://10.143.165.154:8081/api/v2/push/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ message: `error due to ${error.message}` })
+  }
+}
+
+export const getNotifications = async (req, res) => {
+  try {
+    const data = await db
+      .select()
+      .from(notifications)
+      .orderBy(desc(notifications.createdAt));
+
+    if (data.length === 0) {
+      return res.status(404).json({
+        message: "No notifications found"
+      });
+    }
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    return res.status(500).json({
+      message: `Internal server error: ${error.message}`
+    });
   }
 };

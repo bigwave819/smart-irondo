@@ -40,20 +40,17 @@ const OTPPage = () => {
   const { 
     control, 
     handleSubmit, 
-    setValue, // Added to sync manual OTP input with Zod
-    trigger,  // Added to re-validate manually
+    setValue,
+    trigger,
     formState: { errors } 
   } = useForm<OTPForm>({
     resolver: zodResolver(otpSchema),
     defaultValues: { phone: '', activationCode: '' },
   });
 
-  // Sync the [otp] array state with the React Hook Form state
   useEffect(() => {
     const combinedCode = otp.join('');
     setValue('activationCode', combinedCode);
-    
-    // If user finished typing, trigger validation immediately to clear errors
     if (combinedCode.length === OTP_LENGTH) {
       trigger('activationCode');
     }
@@ -73,15 +70,12 @@ const OTPPage = () => {
   });
 
   const handleOtpChange = (text: string, index: number) => {
-    // Only allow numbers
     const cleanText = text.replace(/[^0-9]/g, '');
     if (!cleanText && text !== '') return;
 
     const newOtp = [...otp];
-    newOtp[index] = cleanText.slice(-1); // Take only the last character
+    newOtp[index] = cleanText.slice(-1);
     setOtp(newOtp);
-
-    // Auto-focus next input
     if (cleanText && index < OTP_LENGTH - 1) {
       inputs.current[index + 1]?.focus();
     }
@@ -90,14 +84,13 @@ const OTPPage = () => {
   const handleBackspace = (index: number) => {
     if (otp[index] === '' && index > 0) {
       const newOtp = [...otp];
-      newOtp[index - 1] = ''; // Optional: clear previous box on backspace
+      newOtp[index - 1] = '';
       setOtp(newOtp);
       inputs.current[index - 1]?.focus();
     }
   };
 
   const onSubmit = (formData: OTPForm) => {
-    // Double check logic: isPending is already handled by the button's 'disabled' prop
     mutate(formData);
   };
 

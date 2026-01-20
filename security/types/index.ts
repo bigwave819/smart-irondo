@@ -38,3 +38,11 @@ export interface EvidenceWithReportAndUser {
 //   type: 'image' | 'video'; // stricter than string
 //   createdAt: Date | null;
 // }
+
+
+export interface Notifications {
+  id: number,
+  title: string;
+  message: string,
+  senderId: number
+}

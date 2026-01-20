@@ -37,21 +37,22 @@ const CardData = [
   {
     id: '2',
     name: 'Criminal Photo',
-    icon: 'person-add' as const, // Represents adding/catching criminal
-    color: '#ef4444', // Red
+    icon: 'person-add' as const,
+    color: '#ef4444',
   },
   {
     id: '3',
     name: 'Generate Report',
     icon: 'document-attach' as const,
-    color: '#10b981', // Emerald
+    color: '#10b981',
     path: '/(homelinks)/generate-report'
   },
   {
     id: '4',
     name: 'Ask Support',
     icon: 'call' as const,
-    color: '#8b5cf6', // Purple
+    color: '#8b5cf6',
+    path: '/(homelinks)/Ask-Support'
   }
 ];
 

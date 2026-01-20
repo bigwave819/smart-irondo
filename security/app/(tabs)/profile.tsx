@@ -2,20 +2,25 @@ import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { useQueryClient } from '@tanstack/react-query'; // Import this
+import { useQueryClient } from '@tanstack/react-query';
 
 const Profile = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const queryClient = useQueryClient(); // Initialize the client
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     try {
       setLoading(true);
 
+      // Clear AsyncStorage
       await AsyncStorage.multiRemove(["userToken", "user"]);
+
+      // Clear react-query cache
       queryClient.clear();
-      router.replace('/(auth)'); 
+
+      // Navigate to auth screen
+      router.replace('/(auth)');
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -24,16 +29,27 @@ const Profile = () => {
   };
 
   return (
-    <View className='bg-white flex-1 justify-center px-5'>
+    <View className="flex-1 bg-white justify-center px-5">
+      {/* Header */}
+      <View className="mb-10">
+        <Text className="text-3xl font-bold text-center text-slate-900">
+          Profile
+        </Text>
+      </View>
+
+      {/* Logout Button */}
       <TouchableOpacity
         className={`rounded-full w-full py-4 ${loading ? 'bg-red-300' : 'bg-red-500'}`}
         onPress={handleLogout}
         disabled={loading}
+        activeOpacity={0.8}
       >
         {loading ? (
           <ActivityIndicator size="small" color="white" />
         ) : (
-          <Text className='text-center text-xl font-bold text-white'>Logout</Text>
+          <Text className="text-center text-xl font-bold text-white">
+            Logout
+          </Text>
         )}
       </TouchableOpacity>
     </View>
