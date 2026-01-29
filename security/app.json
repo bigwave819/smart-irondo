@@ -17,12 +17,8 @@
         "backgroundImage": "./assets/images/logo.png",
         "monochromeImage": "./assets/images/logo.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "pan",
       "permissions": [
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.INTERNET",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.INTERNET"
@@ -53,7 +49,6 @@
         {
           "photosPermission": "custom photos permission",
           "cameraPermission": "Allow $(PRODUCT_NAME) to open the camera",
-          "//": "Disables the microphone permission",
           "microphonePermission": false
         }
       ],

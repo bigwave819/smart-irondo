@@ -5,6 +5,10 @@ import BottomSheet, {
 } from '@gorhom/bottom-sheet';
 import React, { useMemo, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { File, Paths } from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import { Alert, Platform } from 'react-native';
+
 
 type EvidenceViewProps = {
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -26,6 +30,45 @@ const EvidenceView = ({ bottomSheetRef, evidence }: EvidenceViewProps) => {
     ),
     []
   );
+const handleDownload = async () => {
+    try {
+      if (!evidence?.evidenceUrl) {
+        Alert.alert("Error", "No evidence URL found");
+        return;
+      }
+
+      // Request permission
+      const permission = await MediaLibrary.requestPermissionsAsync();
+      if (permission.status !== 'granted') {
+        Alert.alert(
+          "Permission denied",
+          "Storage permission is required to download files"
+        );
+        return;
+      }
+
+      // Download file using the new modern API
+      const fileName = `evidence_${Date.now()}.jpg`;
+      const downloadedFile = await File.downloadFileAsync(
+        evidence.evidenceUrl,
+        Paths.cache
+      );
+
+      // The downloaded file already exists in cache, now save it to media library
+      const asset = await MediaLibrary.createAssetAsync(downloadedFile.uri);
+
+      if (Platform.OS === 'android') {
+        await MediaLibrary.createAlbumAsync('SmartIrondo', asset, false);
+      }
+
+      Alert.alert("Success", "Evidence downloaded successfully");
+
+    } catch (error) {
+      console.error("Download error:", error);
+      Alert.alert("Error", "Failed to download evidence");
+    }
+  };
+
 
   return (
     <BottomSheet
@@ -103,6 +146,7 @@ const EvidenceView = ({ bottomSheetRef, evidence }: EvidenceViewProps) => {
               <TouchableOpacity
                 className="flex-1 bg-blue-600 py-4 rounded-full flex-row items-center justify-center"
                 activeOpacity={0.8}
+                onPress={handleDownload}
               >
                 <Ionicons name="download" size={20} color="white" />
                 <Text className="text-white font-bold ml-2">
@@ -140,9 +184,8 @@ const InfoRow = ({
   isLast?: boolean;
 }) => (
   <View
-    className={`flex-row items-center py-3 ${
-      !isLast ? 'border-b border-slate-100' : ''
-    }`}
+    className={`flex-row items-center py-3 ${!isLast ? 'border-b border-slate-100' : ''
+      }`}
   >
     <View className="bg-slate-50 p-2 rounded-lg mr-3">
       <Ionicons name={icon} size={18} color="#64748b" />
