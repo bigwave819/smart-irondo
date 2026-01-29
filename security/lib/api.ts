@@ -10,20 +10,16 @@ export const api = axios.create({
   },
 });
 
-// Use a request interceptor to inject the token automatically
 api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem('userToken');
 
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
-  console.log(BASE_URL);
   
   return config;
 }, (error) => {
   return Promise.reject(error);
 });
 
-// We export a simple hook to use it
 export const useApi = () => api;

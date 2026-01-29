@@ -14,8 +14,7 @@ export const ProtectedRoute = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, ENV.JWT_SECRET);
-
-        // Use proper Drizzle select syntax
+        
         const [user] = await db.select({
             id: UserTable.id,
             fullName: UserTable.fullName,

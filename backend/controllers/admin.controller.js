@@ -145,10 +145,18 @@ export const getAllReports = async (_, res) => {
 
 export const getAllEvidences = async (_, res) => {
     try {
-        const data = await db.query.evidence.findMany({
-            orderBy: [desc(evidence.createdAt)],
-        });
-
+        const data = await db
+                            .select({
+                                reportId: evidence.reportId,
+                                uploadedBy: evidence.uploadedBy,
+                                uploaderName: user.fullName,
+                                type: evidence.type,
+                                createdAt: evidence.createdAt,
+                                url: evidence.url
+                            })
+                            .from(evidence)
+                            .leftJoin(user, eq(evidence.uploadedBy, user.id))
+                            .orderBy(desc(evidence.createdAt))
         return res.status(200).json({
             message: "Evidence retrieved successfully",
             total: data.length,

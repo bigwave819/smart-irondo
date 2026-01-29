@@ -4,7 +4,7 @@ import { ActivityIndicator, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const BACKEND_URL = 'http://10.129.20.154:3000/api/user';
+const BACKEND_URL = `${process.env.EXPO_PUBLIC_API_URL}`;
 
 const RootLayout = () => {
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ const RootLayout = () => {
           setUserIsActive(false);
         }
       } catch (error: any) {
-        console.log('❌ Error fetching user status:', error?.response?.data || error.message);
+        console.log('Error fetching user status:', error?.response?.data || error.message);
         setUserIsActive(false);
       } finally {
         setLoading(false);
@@ -42,7 +42,6 @@ const RootLayout = () => {
     checkUserStatus();
   }, []);
 
-  // Handle Redirection based on state
   useEffect(() => {
     if (loading) return;
 

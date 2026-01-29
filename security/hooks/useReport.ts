@@ -4,8 +4,6 @@ import { Report } from '@/types';
 
 type CreateReportPayload = Omit<Report, "id" | "reportedBy" | "status" | "createdAt">;
 
-const BASE_URL = `${process.env.EXPO_PUBLIC_API_URL}`
-
 const useReport = () => {
   const api = useApi();
   const queryClient = useQueryClient();
@@ -17,8 +15,6 @@ const useReport = () => {
         const response = await api.get<{ reports: Report[] }>(`/reports`);
         return response.data.reports;
       } catch (err: any) {
-        console.error("📡 API FETCH ERROR:", `${BASE_URL}/reports`);
-        console.error("📡 API FETCH ERROR:", err.message);
         throw err;
       }    
     },
@@ -33,7 +29,7 @@ const useReport = () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] });
     },
     onError: (error) => {
-      console.error("❌ Error creating report:", error);
+      console.error("Error creating report:", error);
     }
   });
 

@@ -99,7 +99,6 @@ export const login = async (req, res) => {
     }
 }
 
-
 export const checkUser = async (req, res) => {
   try {
     const { phone } = req.params;

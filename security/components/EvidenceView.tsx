@@ -14,7 +14,6 @@ type EvidenceViewProps = {
 const EvidenceView = ({ bottomSheetRef, evidence }: EvidenceViewProps) => {
   const snapPoints = useMemo(() => ['90%'], []);
 
-  // BACKDROP
   const renderBackdrop = useCallback(
     (props: any) => (
       <BottomSheetBackdrop
@@ -64,7 +63,7 @@ const EvidenceView = ({ bottomSheetRef, evidence }: EvidenceViewProps) => {
             {/* IMAGE */}
             <View className="items-center mb-6">
               <Image
-                source={{ uri: evidence.url }}
+                source={{ uri: evidence.evidenceUrl }}
                 style={{
                   width: 260,
                   height: 260,
@@ -102,7 +101,7 @@ const EvidenceView = ({ bottomSheetRef, evidence }: EvidenceViewProps) => {
             {/* ACTION */}
             <View className="flex-row gap-3">
               <TouchableOpacity
-                className="flex-1 bg-blue-600 py-4 rounded-xl flex-row items-center justify-center"
+                className="flex-1 bg-blue-600 py-4 rounded-full flex-row items-center justify-center"
                 activeOpacity={0.8}
               >
                 <Ionicons name="download" size={20} color="white" />

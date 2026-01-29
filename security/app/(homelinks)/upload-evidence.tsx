@@ -28,7 +28,7 @@ const UploadEvidence = () => {
 
   // Function to open bottom sheet with selected evidence
   const handleOpenBottomSheet = (item: any) => {
-    setSelectedEvidence(item);
+    setSelectedEvidence(item);    
     bottomSheetRef.current?.expand();
   };
 

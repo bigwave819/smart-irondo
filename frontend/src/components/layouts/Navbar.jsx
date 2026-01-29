@@ -6,9 +6,9 @@ import SlideMenu from './sliderMenu'
 const Navbar = ({ activeMenu }) => {
   const [openSideMenu, setOpenSideMenu] = useState(false)
   const [openProfile, setOpenProfile] = useState(false)
-  const profileRef = useRef(null)
 
-  // Close dropdown on outside click
+  const profileRef = useRef(null)
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {

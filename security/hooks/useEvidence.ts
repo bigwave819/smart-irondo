@@ -5,8 +5,6 @@ import { EvidenceWithReportAndUser } from "@/types";
 export const useEvidence = () => {
   const api = useApi();
   const queryClient = useQueryClient();
-
-  // Fetch all evidence
   const { data, isLoading, isError } = useQuery<EvidenceWithReportAndUser[]>({
     queryKey: ['evidences'],
     queryFn: async () => {
@@ -18,16 +16,20 @@ export const useEvidence = () => {
 
   const createEvidenceMutation = useMutation({
     mutationFn: async ({ reportId, fileUrl }: { reportId: number; fileUrl: string }) => {
+
       const fileName = fileUrl.split('/').pop() || 'evidence.jpg';
+
       const ext = fileName.split('.').pop()?.toLowerCase();
+
       let type = 'image/jpeg';
+
       if (ext === 'png') type = 'image/png';
+
       else if (ext === 'webp') type = 'image/webp';
 
       const formData = new FormData();
       formData.append('reportId', reportId.toString());
 
-      // Send file as "url" for backend
       formData.append('url', {
         uri: fileUrl,
         name: fileName,

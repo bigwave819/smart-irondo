@@ -35,15 +35,10 @@ const AddReportModal = ({ isVisble, onClose }: Props) => {
     const userData = await AsyncStorage.getItem("user");
 
     if (!userData) {
-      console.warn("⚠ No user found in AsyncStorage");
+      console.warn("No user found in AsyncStorage");
       return;
     }
-
     const user = JSON.parse(userData);
-    console.log("👤 Logged in user:", user);
-
-
-
     const payload = {
       reportType,
       incidentType,
@@ -55,15 +50,15 @@ const AddReportModal = ({ isVisble, onClose }: Props) => {
 
     createReport(payload, {
       onSuccess: (res) => {
-        console.log("✅ Report created successfully:", res);
+        console.log("Report created successfully:", res);
         onClose();
       },
       onError: (err) => {
-        console.error("❌ Error creating report:", err);
+        console.error("Error creating report:", err);
       },
     });
 
-    console.log(payload); // replace with API call
+    console.log(payload);
     onClose();
     } catch (error) {
       console.log(`error due to ${error}`);      

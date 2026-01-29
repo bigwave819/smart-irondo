@@ -38,7 +38,6 @@ const EvidenceModal = ({
   const { reports } = useReport();
   const { createEvidence, isCreating } = useEvidence();
 
-  // Pick an image from gallery
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -61,7 +60,7 @@ const EvidenceModal = ({
     createEvidence(
       {
         reportId: Number(evidenceForm.reportId),
-        fileUrl: evidenceForm.url, // pass the actual file URI
+        fileUrl: evidenceForm.url,
       },
       {
         onSuccess: () => {

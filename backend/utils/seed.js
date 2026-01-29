@@ -8,7 +8,6 @@ export const seedAdmin = async () => {
   const ADMIN_PASSWORD = "Admin@123";
 
   try {
-    // 1. Correctly check if the array has length
     const existing = await db
       .select()
       .from(user)
@@ -16,14 +15,11 @@ export const seedAdmin = async () => {
       .limit(1);
 
     if (existing.length > 0) {
-      console.log("ℹ️ Admin already exists, skipping...");
+      console.log("admin already exists, skipping...");
       return;
     }
-
-    // 2. Hash password
     const hashedPassword = await bcryptjs.hash(ADMIN_PASSWORD, 10);
 
-    // 3. Insert using the correct table variable (user)
     await db.insert(user).values({
       fullName: "System Administrator",
       phone: ADMIN_PHONE,
@@ -33,9 +29,9 @@ export const seedAdmin = async () => {
       location: null,
     });
 
-    console.log("✅ Admin user seeded successfully");
+    console.log("Admin user seeded successfully");
   } catch (error) {
-    console.error("❌ Error seeding admin:", error);
+    console.error("Error seeding admin:", error);
     process.exit(1);
   }
 };

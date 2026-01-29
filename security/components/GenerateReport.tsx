@@ -20,10 +20,7 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
 
   const handleCloseModal = () => setShowReportForm(false);
 
-  const handleDownload = async (reportId: number, title: string) => {
-    console.log('🚀 Starting download...');
-    console.log('📋 Report ID:', reportId);
-    
+  const handleDownload = async (reportId: number, title: string) => {    
     try {
       const token = await AsyncStorage.getItem('userToken');
       
@@ -33,43 +30,26 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
       }
       
       const downloadUrl = `${process.env.EXPO_PUBLIC_API_URL}/reports/${reportId}/download`;
-      console.log('🌐 Download URL:', downloadUrl);
-      
-      // Create destination directory
       const destination = new Directory(Paths.document, 'reports');
-      
       if (!destination.exists) {
         destination.create();
-        console.log('✅ Directory created');
+        console.log('Directory created');
       }
-
-      // Delete all existing files in the directory to avoid conflicts
-      console.log('🗑️ Cleaning up old files...');
       const existingFiles = destination.list();
       for (const file of existingFiles) {
         try {
-          await file.delete();
+          file.delete();
           console.log('Deleted:', file.uri);
         } catch (e) {
           console.log('Could not delete file:', e);
         }
       }
-
-      // Download the file - let the server determine the filename
-      console.log('⬇️ Downloading...');
       const downloadedFile = await File.downloadFileAsync(downloadUrl, destination, {
         headers: {
           'Authorization': `Bearer ${token}`,
         }
       });
-      
-      console.log('✅ Download complete!');
-      console.log('📄 File URI:', downloadedFile.uri);
-      console.log('📊 File size:', downloadedFile.size, 'bytes');
-
-      // Share the file
       const isAvailable = await Sharing.isAvailableAsync();
-      
       if (isAvailable) {
         await Sharing.shareAsync(downloadedFile.uri, {
           mimeType: 'application/pdf',
@@ -84,7 +64,7 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
       }
 
     } catch (error: any) {
-      console.error("❌ Download failed:", error?.message);
+      console.error("Download failed:", error?.message);
       
       let errorMessage = "Failed to download report";
       
@@ -95,7 +75,6 @@ const GenerateReport = ({ isError, isLoading, reports }: ReportsGridProps) => {
       } else if (error?.message) {
         errorMessage = error.message;
       }
-      
       Alert.alert("Download Failed", errorMessage);
     }
   };
