@@ -34,3 +34,20 @@ export const useReports = {
         return data
     },
 }
+
+export const useDashboard = {
+    getStats: async () => {
+        const { data } = await axiosInstance.get('/admin/stats')
+        return data
+    },
+
+    getTrends: async () => {
+        const { data } = await axiosInstance.get('/admin/trends')
+        return data
+    },
+
+    getAlerts: async () => {
+        const { data } = await axiosInstance.get('/admin/alerts')
+        return data
+    }
+}
