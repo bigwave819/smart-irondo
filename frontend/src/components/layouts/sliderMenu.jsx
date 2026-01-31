@@ -19,7 +19,7 @@ const SidebarMenu = ({ activeMenu }) => {
   };
 
   return (
-    <aside className="w-72 sticky h-screen top-0 border-r border-gray-200 bg-white px-6 py-8 flex flex-col">
+    <aside className="w-72 h-full border-r border-gray-200 bg-white px-6 py-8 flex flex-col">
       
       {/* NAVIGATION + LOGOUT TOGETHER */}
       <nav className="space-y-2">

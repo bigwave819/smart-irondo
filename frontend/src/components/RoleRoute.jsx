@@ -7,6 +7,8 @@ const AdminRoute = () => {
   if (!isAdmin) {
     localStorage.clear()
     return <Navigate to="/" replace />
+  } else {
+   <Navigate to="/dashboard"/> 
   }
 
   return <Outlet />

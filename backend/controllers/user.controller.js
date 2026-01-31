@@ -83,9 +83,8 @@ export const generateReport = async (req, res) => {
 
 export const downloadReport = async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
 
-    // Fetch the report from the database
     const [report] = await db
       .select()
       .from(reports)
@@ -96,57 +95,161 @@ export const downloadReport = async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
-    const doc = new PDFDocument({ margin: 50 })
+    const doc = new PDFDocument({
+      size: "A4",
+      margin: 50,
+      bufferPages: false,
+    });
 
-    res.setHeader("Content-Type", "application/pdf")
+    res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
-      'Content-Disposition',
-      `attachement; filename=report-${report.id}.pdf`
+      "Content-Disposition",
+      `attachment; filename=report-${report.id}.pdf`
     );
 
     doc.pipe(res);
 
-    /* ========== PDF CONTENT ============= */
+    /* ========== COLORS (RWANDA STYLE) ========== */
+    const colors = {
+      primary: "#003A8F",   // Government blue
+      text: "#111827",
+      muted: "#6B7280",
+      border: "#D1D5DB",
+    };
 
-    doc.fontSize(18).text("SMART IRONDO SECURITY REPORT", { align: "center" });
-    doc.moveDown();
+    /* ========== HEADER ========== */
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(16)
+      .fillColor(colors.primary)
+      .text("SMART IRONDO SECURITY SYSTEM", { align: "center" });
 
-    doc.fontSize(12).text(`Report ID: ${report.id}`);
-    doc.text(`Report Type: ${report.reportType}`);
-    doc.text(`Incident Type: ${report.incidentType || "None"}`);
-    doc.text(`Status: ${report.status}`);
-    doc.text(`Date: ${new Date(report.createdAt).toLocaleString()}`);
+    doc
+      .fontSize(11)
+      .fillColor(colors.text)
+      .text("SECURITY INCIDENT REPORT", { align: "center" });
 
-    doc.moveDown();
+    doc
+      .moveDown(0.5)
+      .strokeColor(colors.border)
+      .lineWidth(1)
+      .moveTo(50, doc.y)
+      .lineTo(doc.page.width - 50, doc.y)
+      .stroke();
 
-    doc.text("LOCATION", { underline: true });
-    doc.text(
-      `${report.location.district} / ${report.location.sector} / ${report.location.cell} / ${report.location.village}`
-    );
+    /* ========== META INFO ========== */
+    let y = doc.y + 15;
 
-    doc.moveDown();
+    doc.fontSize(10).font("Helvetica");
+    doc.text(`Report Number: ${report.id}`, 50, y);
+    doc.text(`Date: ${new Date(report.createdAt).toLocaleDateString()}`, 350, y);
 
-    doc.text("DESCRIPTION", { underline: true });
-    doc.text(report.description);
+    y += 25;
 
-    doc.moveDown();
+    /* ========== SECTION TITLE HELPER ========== */
+    const sectionTitle = (title) => {
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(11)
+        .fillColor(colors.primary)
+        .text(title, 50, y);
+      y += 12;
 
-    doc.text("REPORTED BY", { underline: true });
-    doc.text(`Name: ${report.reportedBy.fullName}`);
-    doc.text(`Phone: ${report.reportedBy.phone}`);
+      doc
+        .strokeColor(colors.border)
+        .moveTo(50, y)
+        .lineTo(doc.page.width - 50, y)
+        .stroke();
+
+      y += 10;
+    };
+
+    const field = (label, value) => {
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .fillColor(colors.text)
+        .text(label, 50, y);
+
+      doc
+        .font("Helvetica")
+        .text(value || "N/A", 200, y);
+
+      y += 18;
+    };
+
+    /* ========== REPORT DETAILS ========== */
+    sectionTitle("1. REPORT DETAILS");
+
+    field("Report Type", report.reportType);
+    field("Incident Type", report.incidentType);
+    field("Status", report.status);
+    field("Title", report.title);
+
+    y += 5;
+
+    /* ========== LOCATION ========== */
+    sectionTitle("2. LOCATION INFORMATION");
+
+    field("District", report.location?.district);
+    field("Sector", report.location?.sector);
+    field("Cell", report.location?.cell);
+    field("Village", report.location?.village);
+
+    y += 5;
+
+    /* ========== DESCRIPTION ========== */
+    sectionTitle("3. INCIDENT DESCRIPTION");
+
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .fillColor(colors.text)
+      .text(report.description || "No description provided.", 50, y, {
+        width: doc.page.width - 100,
+        align: "justify",
+      });
+
+    y = doc.y + 10;
+
+    /* ========== REPORTER ========== */
+    sectionTitle("4. REPORTER INFORMATION");
+
+    field("Full Name", report.reportedBy?.fullName || "Anonymous");
+    field("Phone Number", report.reportedBy?.phone);
+
+    /* ========== FOOTER ========== */
+    doc
+      .strokeColor(colors.border)
+      .moveTo(50, doc.page.height - 90)
+      .lineTo(doc.page.width - 50, doc.page.height - 90)
+      .stroke();
+
+    doc
+      .fontSize(8)
+      .fillColor(colors.muted)
+      .text(
+        "This document is officially generated by Smart Irondo Security System.",
+        50,
+        doc.page.height - 75,
+        { align: "center", width: doc.page.width - 100 }
+      );
+
+    doc
+      .fontSize(8)
+      .text(
+        "© 2025 Smart Irondo Security System | Republic of Rwanda",
+        50,
+        doc.page.height - 60,
+        { align: "center", width: doc.page.width - 100 }
+      );
 
     doc.end();
-
-    console.log('downloaded successfully');
-
-
   } catch (error) {
-    res.status(500).json({
-      message: "Failed to download report",
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: "Failed to generate report" });
   }
-}
+};
 
 export const downloadEvidence = async (req, res) => {
   try {
