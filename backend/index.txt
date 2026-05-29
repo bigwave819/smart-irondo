@@ -1,2 +1,4 @@
 username = Uwamahoro Violette
 password = Vio@2!#
+username and phone = 0796147516 0722802562 Nsabimana Valens
+password= Va@2l2nS!

@@ -31,15 +31,6 @@ const Users = () => {
     queryFn: useUsers.getAllUsers,
   });
 
-  /* ================= CREATE USER ================= */
-  const createUserMutation = useMutation({
-    mutationFn: useUsers.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      closeModal();
-    },
-  });
-
   /* ================= HELPERS ================= */
   const closeModal = () => {
     setOpenModal(false);
@@ -54,6 +45,15 @@ const Users = () => {
       },
     });
   };
+
+  /* ================= CREATE USER ================= */
+  const createUserMutation = useMutation({
+    mutationFn: useUsers.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      closeModal();
+    },
+  });
 
   const updateLocation = (field, value) => {
     setFormData((prev) => ({

@@ -34,14 +34,7 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-// ===================
-// API FUNCTION
-// ===================
 const loginUser = async (data: LoginFormData) => {
-  // REQUIREMENT: Log the endpoint and data being sent
-  console.log(`📡 Requesting: POST ${BACKEND_URL}`);
-  console.log(`📤 Data Sent:`, data);
-
   const response = await api.post(BACKEND_URL, data);
   return response.data;
 };
@@ -55,16 +48,10 @@ const Login = () => {
     defaultValues: { phone: '', password: '' },
   });
 
-  // ===================
-  // MUTATION
-  // ===================
   const { mutate, isPending } = useMutation({
     mutationFn: loginUser,
     onSuccess: async (data) => {
-      console.log('✅ Login Successful:', data);
-      
       try {
-        // Clear old tokens and save new user data
         await AsyncStorage.removeItem('userToken');
         await AsyncStorage.removeItem('userPhone')
         const userValue = typeof data.user === 'object' ? JSON.stringify(data.user) : data.user;
